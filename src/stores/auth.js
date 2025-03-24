@@ -10,6 +10,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   const state = ref(initialState)
 
+  // Add a flag to prevent refresh loops
+  const isRefreshing = ref(false)
+
   const login = async (password) => {
     try {
       const response = await axios.post('/api/login', { password })
@@ -45,11 +48,15 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const refreshToken = async () => {
+    // Prevent concurrent refresh attempts
+    if (isRefreshing.value) return false
+    
+    isRefreshing.value = true
     try {
       const response = await axios.post('/api/refresh', { refresh_token: state.value.refreshToken })
       if (response.data.success) {
-        state.value.accessToken = response.data.access_token // 修复：去掉 .data
-        state.value.refreshToken = response.data.refresh_token // 修复：去掉 .data
+        state.value.accessToken = response.data.access_token
+        state.value.refreshToken = response.data.refresh_token
         localStorage.setItem('auth', JSON.stringify(state.value))
         return true
       }
@@ -58,6 +65,8 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       logout()
       return false
+    } finally {
+      isRefreshing.value = false
     }
   }
 
@@ -80,12 +89,12 @@ export const useAuthStore = defineStore('auth', () => {
   axios.interceptors.response.use(
     (response) => response,
     async (error) => {
-      if (error.response?.status === 401) {
-        // 尝试刷新令牌，如果失败则登出
+      if (error.response?.status === 401 && !isRefreshing.value) {
+        // Try to refresh token, if fails then logout
         const refreshSuccess = await refreshToken()
         if (!refreshSuccess) {
           logout()
-          // 重定向到登录页
+          // Redirect to login page
           window.location.href = '/#/login'
         }
       }

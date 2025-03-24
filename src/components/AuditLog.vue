@@ -130,6 +130,12 @@ const columns = [
     width: 300,
   },
   {
+    title: '用户ID',
+    dataIndex: 'user_id',
+    key: 'user_id',
+    width: 100,
+  },
+  {
     title: '来源',
     dataIndex: 'source',
     key: 'source',
