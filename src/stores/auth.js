@@ -81,7 +81,13 @@ export const useAuthStore = defineStore('auth', () => {
     (response) => response,
     async (error) => {
       if (error.response?.status === 401) {
-        logout()
+        // 尝试刷新令牌，如果失败则登出
+        const refreshSuccess = await refreshToken()
+        if (!refreshSuccess) {
+          logout()
+          // 重定向到登录页
+          window.location.href = '/#/login'
+        }
       }
       return Promise.reject(error)
     },
