@@ -61,7 +61,7 @@
       :confirm-loading="disposeLoading"
     >
       <p>
-        对消息：<a-typography-text strong>{{ currentRecord?.content }}</a-typography-text> 进行处置
+        对消息：<a-typography-text strong>{{ currentRecord?.id }}</a-typography-text> 进行处置
       </p>
       <a-checkbox-group v-model:value="selectedActions">
         <a-row>
@@ -71,22 +71,8 @@
                 !currentRecord?.source?.includes('aiocqhttp') ? '操作仅在aiocqhttp平台可用' : ''
               "
             >
-              <a-checkbox value="mute" :disabled="!currentRecord?.source?.includes('aiocqhttp')">
-                禁言
-              </a-checkbox>
-            </a-tooltip>
-          </a-col>
-          <a-col :span="24">
-            <a-tooltip
-              :title="
-                !currentRecord?.source?.includes('aiocqhttp') ? '操作仅在aiocqhttp平台可用' : ''
-              "
-            >
-              <a-checkbox
-                value="withdraw"
-                :disabled="!currentRecord?.source?.includes('aiocqhttp')"
-              >
-                撤回
+              <a-checkbox value="dispose" :disabled="!currentRecord?.source?.includes('aiocqhttp')">
+                处置
               </a-checkbox>
             </a-tooltip>
           </a-col>
